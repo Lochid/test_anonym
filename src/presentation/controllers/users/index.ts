@@ -1,8 +1,8 @@
 import { Request, Response, Router } from "express";
 import { sign } from "jsonwebtoken";
 import { IUserService } from "../../../services/interfaces";
-import { RegistrationRequest, RegistrationResponse } from "./models";
-import { validateRegistrationRequest } from "../validators";
+import { RegistrationRequest, RegistrationResponse, BanRequest } from "./models";
+import { validateRegistrationRequest, validateBanRequest } from "../validators";
 import passport from "passport";
 
 export default class Users {
@@ -11,6 +11,7 @@ export default class Users {
     constructor(private jwtSecret: string, private userService: IUserService) {
         this.router = Router();
         this.router.post("/", validateRegistrationRequest, (req: Request, res: Response) => this.registration(req, res));
+        this.router.put("/", validateBanRequest, passport.authenticate('jwt', { session: false }), (req: Request, res: Response) => this.ban(req, res));
     }
 
     run(router: Router) {
@@ -37,6 +38,16 @@ export default class Users {
                 token,
                 user: response,
             }));
+        } catch (e) {
+            res.status(500).send(e)
+        }
+    }
+
+    async ban(req: Request, res: Response) {
+        try {
+            const body: BanRequest = req.body;
+            await this.userService.Ban(body.id);
+            res.send(JSON.stringify({}));
         } catch (e) {
             res.status(500).send(e)
         }

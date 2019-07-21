@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { bodyIsEmpty, loginIsEmpty, loginIsTooShort, loginIsTooLong, passwordIsEmpty, passwordIsTooShort, passwordIsTooLong } from "../../constants/errors";
-import { RegistrationRequest } from "./users/models";
+import { bodyIsEmpty, loginIsEmpty, loginIsTooShort, loginIsTooLong, passwordIsEmpty, passwordIsTooShort, passwordIsTooLong, idIsEmpty, idLessThanZero } from "../../constants/errors";
+import { RegistrationRequest, BanRequest } from "./users/models";
 
 
 export function validateBody(req: Request, res: Response, next: NextFunction) {
@@ -49,5 +49,20 @@ export function validatePassword(req: Request, res: Response, next: NextFunction
     next();
 }
 
+export function validateID(req: Request, res: Response, next: NextFunction) {
+    const body: BanRequest = req.body;
+
+    if (body.id == null) {
+        return res.status(400).send(idIsEmpty)
+    }
+
+    if (body.id < 0) {
+        return res.status(400).send(idLessThanZero)
+    }
+    next();
+}
+
+
 export const validateRegistrationRequest = [validateBody, validateLogin, validatePassword];
 export const validateLoginRequest = [validateBody, validateLogin, validatePassword];
+export const validateBanRequest = [validateBody, validateID];

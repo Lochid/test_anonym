@@ -12,6 +12,8 @@ const createQuery = `INSERT INTO users(
 
 const readByLoginQuery = `SELECT * FROM users WHERE login=?;`;
 
+const banUserQuery = `UPDATE users SET banned=true WHERE id=?;`;
+
 export default class UserRepository implements IUserRepository {
     constructor(private connection: Connection) { }
 
@@ -55,6 +57,22 @@ export default class UserRepository implements IUserRepository {
                     }
 
                     resolve(undefined);
+                });
+        });
+    }
+
+    Ban(id: number): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            this.connection.query(banUserQuery,
+                [
+                    id,
+                ],
+                (error) => {
+                    if (error) {
+                        return reject(error);
+                    }
+
+                    return resolve();
                 });
         });
     }

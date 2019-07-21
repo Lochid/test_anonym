@@ -7,3 +7,7 @@ export interface RegistrationResponse {
     id: number;
     login: string;
 }
+
+export interface BanRequest {
+    id: number;
+}
