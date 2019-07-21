@@ -1,0 +1,31 @@
+version: '3'
+services:
+  backend:
+    build: .
+    depends_on:
+      - db
+    networks:
+      - backend
+    ports:
+      - '3000:3000'
+    expose:
+      - '3000'
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'chat'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    networks:
+      backend:
+        aliases:
+          - database
+
+networks:
+  backend:
