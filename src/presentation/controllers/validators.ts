@@ -50,3 +50,4 @@ export function validatePassword(req: Request, res: Response, next: NextFunction
 }
 
 export const validateRegistrationRequest = [validateBody, validateLogin, validatePassword];
+export const validateLoginRequest = [validateBody, validateLogin, validatePassword];

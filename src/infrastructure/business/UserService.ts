@@ -7,6 +7,7 @@ import { IUserService } from '../../services/interfaces';
 import { PASSWORD_HASHER, DATABASE } from '../../constants/identifiers';
 import { IPasswordHasher } from '../../utils/interfaces';
 import { IRepositoryPool, IUserRepository } from '../../domain/interfaces';
+import { loginIsWrong, passwordIsWrong } from '../../constants/errors';
 
 @injectable()
 export default class UserService implements IUserService {
@@ -20,5 +21,19 @@ export default class UserService implements IUserService {
         const passwordHash = this.passwordHasher.generate(password);
         await this.userRepository.Create(new User(0, login, passwordHash));
         return this.userRepository.ReadByLogin(login);
+    }
+    
+
+    async Login(login: string, password: string): Promise<User> {
+        const user = await this.userRepository.ReadByLogin(login);
+        if (user == null) {
+            throw loginIsWrong;
+        }
+
+        if (!this.passwordHasher.verify(password, user.passwordHash)) {
+            throw passwordIsWrong;
+        }
+
+        return user;
     }
 }
