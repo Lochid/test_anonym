@@ -5,10 +5,12 @@ import {
 } from 'inversify';
 import { CONFIG } from "../../../constants/identifiers";
 import IConfig from "./config";
-import { IRepositoryPool } from "../../../domain/interfaces";
+import { IRepositoryPool, IUserRepository } from "../../../domain/interfaces";
+import UserRepository from "./UserRepository";
 
 @injectable()
 export class RepositoryPool implements IRepositoryPool {
+    private userRepository: IUserRepository;
 
     constructor(@inject(CONFIG) config: IConfig) {
         const {
@@ -26,6 +28,10 @@ export class RepositoryPool implements IRepositoryPool {
 
         connection.connect();
 
+        this.userRepository = new UserRepository(connection);
     }
-
+    
+    UserRepository(): IUserRepository {
+        return this.userRepository;
+    }
 }
