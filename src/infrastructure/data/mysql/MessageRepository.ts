@@ -18,6 +18,10 @@ const readConversationListQuery = `SELECT id, user_id, conversation, text, creat
     GROUP BY conversation, user_id, id, text, created_at
     HAVING COUNT(*) = 1;`;
 
+const readMessageListQuery = `SELECT *
+            FROM messages 
+            WHERE conversation=?;`;
+
 const readMessageByIDQuery = `SELECT *
                     FROM messages 
                     WHERE id=?;`;
@@ -68,6 +72,33 @@ export default class MessageRepository implements IMessageRepository {
                 }
 
                 resolve({});
+            });
+        });
+    }
+
+
+    ReadMessageList(conversation: string): Promise<Message[]> {
+        return new Promise<Message[]>((resolve, reject) => {
+            this.connection.query(readMessageListQuery, [conversation], (error, results, fields) => {
+                if (error) {
+                    return reject(error);
+                }
+
+                if (fields != undefined && results != undefined) {
+                    const messages = [] as Message[];
+                    for (const res of results) {
+                        const data: { [key: string]: any; } = {};
+                        for (const field of fields) {
+                            data[field.name] = res[field.name];
+                        }
+
+                        messages.push(new Message(data))
+                    }
+
+                    return resolve(messages);
+                }
+
+                resolve([]);
             });
         });
     }

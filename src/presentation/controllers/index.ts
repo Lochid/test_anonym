@@ -15,6 +15,7 @@ import Users from './users';
 import Auth from './auth';
 import { idIsWrong, userIsBanned } from '../../constants/errors';
 import Messages from './messages';
+import Conversations from './conversations';
 
 @injectable()
 export default class Controllers {
@@ -72,10 +73,12 @@ export default class Controllers {
 
         const users = new Users(this.config.jwt.secret, this.userService);
         const auth = new Auth(this.config.jwt.secret, this.userService);
+        const conversations = new Conversations(this.messageService);
         const messages = new Messages(this.messageService, socket);
 
         users.run(app);
         auth.run(app);
+        conversations.run(app);
         messages.run(app);
 
 

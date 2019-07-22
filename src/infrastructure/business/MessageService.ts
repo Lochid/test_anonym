@@ -31,6 +31,10 @@ export default class MessageService implements IMessageService {
         return this.messageRepository.ReadConversationList();
     }
 
+    ReadMessageList(conversation: string): Promise<Message[]> {
+        return this.messageRepository.ReadMessageList(conversation);
+    }
+
     on(event: 'message', listener: (this: IMessageService, message: Message) => void): this;
     on(event: 'message', listener: (this: IMessageService, ...params: any[]) => void): this {
         this.emitter.on(event, listener);

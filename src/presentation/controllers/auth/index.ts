@@ -3,7 +3,7 @@ import { sign } from "jsonwebtoken";
 import { IUserService } from "../../../services/interfaces";
 import { LoginRequest } from "./models";
 import { validateLoginRequest } from "../validators";
-import { loginIsWrong, passwordIsWrong } from "../../../constants/errors";
+import { loginIsWrong, passwordIsWrong, userIsBanned } from "../../../constants/errors";
 
 export default class Auth {
     private router: Router;
@@ -36,6 +36,9 @@ export default class Auth {
         } catch (e) {
             if (e == loginIsWrong || e == passwordIsWrong) {
                 return res.status(400).send(e)
+            }
+            if (e == userIsBanned) {
+                return res.status(451).send(e)
             }
 
             res.status(500).send(e)
