@@ -7,7 +7,7 @@ import { Server } from "socket.io";
 
 export default class Messages {
     private router: Router;
-    constructor(private messageService: IMessageService, private socket: Server) {
+    constructor(private messageService: IMessageService, socket: Server) {
         this.router = Router();
         this.router.post("/", validateSendRequest, passport.authenticate('jwt', { session: false }), (req: Request, res: Response) => this.send(req, res));
 

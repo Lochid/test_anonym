@@ -13,6 +13,11 @@ const createQuery = `INSERT INTO messages(
 );
 `;
 
+const readConversationListQuery = `SELECT id, user_id, conversation, text, created_at
+    FROM messages 
+    GROUP BY conversation, user_id, id, text, created_at
+    HAVING COUNT(*) = 1;`;
+
 const readMessageByIDQuery = `SELECT *
                     FROM messages 
                     WHERE id=?;`;
@@ -38,6 +43,35 @@ export default class MessageRepository implements IMessageRepository {
                 });
         });
     }
+
+
+    ReadConversationList(): Promise<{ [conversation: string]: Message }> {
+        return new Promise<{ [conversation: string]: Message }>((resolve, reject) => {
+            this.connection.query(readConversationListQuery, [], (error, results, fields) => {
+                if (error) {
+                    return reject(error);
+                }
+
+                if (fields != undefined && results != undefined) {
+                    const conversations = {} as { [conversation: string]: Message }
+                    for (const res of results) {
+                        const data: { [key: string]: any; } = {};
+                        for (const field of fields) {
+                            data[field.name] = res[field.name];
+                        }
+
+                        const conv = new Message(data);
+                        conversations[conv.conversation] = conv;
+                    }
+
+                    return resolve(conversations);
+                }
+
+                resolve({});
+            });
+        });
+    }
+
 
     ReadMessageByID(id: string): Promise<Message> {
         return new Promise<Message>((resolve, reject) => {
