@@ -5,12 +5,14 @@ import {
 } from 'inversify';
 import { CONFIG } from "../../../constants/identifiers";
 import IConfig from "./config";
-import { IRepositoryPool, IUserRepository } from "../../../domain/interfaces";
+import { IRepositoryPool, IUserRepository, IMessageRepository } from "../../../domain/interfaces";
 import UserRepository from "./UserRepository";
+import MessageRepository from "./MessageRepository";
 
 @injectable()
 export class RepositoryPool implements IRepositoryPool {
     private userRepository: IUserRepository;
+    private messageRepository: IMessageRepository;
 
     constructor(@inject(CONFIG) config: IConfig) {
         const {
@@ -29,9 +31,14 @@ export class RepositoryPool implements IRepositoryPool {
         connection.connect();
 
         this.userRepository = new UserRepository(connection);
+        this.messageRepository = new MessageRepository(connection);
     }
     
     UserRepository(): IUserRepository {
         return this.userRepository;
+    }
+    
+    MessageRepository(): IMessageRepository {
+        return this.messageRepository;
     }
 }

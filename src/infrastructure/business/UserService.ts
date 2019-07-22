@@ -39,6 +39,10 @@ export default class UserService implements IUserService {
         return user;
     }
 
+    async ReadByID(id: number): Promise<User | undefined> {
+        return this.userRepository.ReadByID(id);
+    }
+
     async Ban(id: number): Promise<void> {
         return this.userRepository.Ban(id);
     }

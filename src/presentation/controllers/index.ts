@@ -8,17 +8,21 @@ import io from "socket.io";
 import socketioJwt from "socketio-jwt";
 import passport from "passport";
 import passportJWT, { VerifiedCallback } from "passport-jwt";
-import { CONFIG } from '../../constants/identifiers';
+import { CONFIG, USER_SERVICE, MESSAGE_SERVICE } from '../../constants/identifiers';
 import IConfig from './config';
+import { IUserService, IMessageService } from '../../services/interfaces';
+import Users from './users';
+import Auth from './auth';
+import { idIsWrong, userIsBanned } from '../../constants/errors';
+import Messages from './messages';
 
 @injectable()
 export default class Controllers {
-    constructor(@inject(CONFIG) private config: IConfig) {
+    constructor(@inject(CONFIG) private config: IConfig, @inject(USER_SERVICE) private userService: IUserService, @inject(MESSAGE_SERVICE) private messageService: IMessageService) {
     }
 
     async jwtAuth(jwt_payload: any, next: VerifiedCallback) {
-        /*
-        TODO: READING user
+        const user = await this.userService.ReadByID(jwt_payload.id);
 
         if (user == undefined) {
             return next(idIsWrong, null);
@@ -27,10 +31,8 @@ export default class Controllers {
         if (user.banned) {
             return next(userIsBanned, null);
         }
-        next(null, user);
-*/
 
-        next(null, {});
+        next(null, user);
 
     }
 
@@ -57,20 +59,26 @@ export default class Controllers {
             secret: jwtOptions.secretOrKey,
             timeout: 15000
         } as any)).on('authenticated', async (connection: any) => {
+            const user = await this.userService.ReadByID(connection.decoded_token.id);
 
-            /*
-            TODO: READING user
-    
             if (user == undefined) {
                 return connection.disconnect();
             }
-    
+
             if (user.banned) {
                 return connection.disconnect();
             }
-            next(null, user);
-    */
         });
+
+        const users = new Users(this.config.jwt.secret, this.userService);
+        const auth = new Auth(this.config.jwt.secret, this.userService);
+        const messages = new Messages(this.messageService, socket);
+
+        users.run(app);
+        auth.run(app);
+        messages.run(app);
+
+
 
         server.listen(this.config.network.port, () => {
             console.log("Server started: ", this.config.network.port);

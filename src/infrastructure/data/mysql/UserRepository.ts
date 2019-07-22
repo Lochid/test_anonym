@@ -12,6 +12,8 @@ const createQuery = `INSERT INTO users(
 
 const readByLoginQuery = `SELECT * FROM users WHERE login=?;`;
 
+const readByIDQuery = `SELECT * FROM users WHERE id=?;`;
+
 const banUserQuery = `UPDATE users SET banned=true WHERE id=?;`;
 
 export default class UserRepository implements IUserRepository {
@@ -40,6 +42,34 @@ export default class UserRepository implements IUserRepository {
             this.connection.query(readByLoginQuery,
                 [
                     login,
+                ],
+                (error, results, fields) => {
+                    if (error) {
+                        return reject(error);
+                    }
+
+                    if (fields != undefined && results != undefined && results[0] != undefined) {
+                        const res = results[0];
+                        const data: { [key: string]: any; } = {};
+                        for (const field of fields) {
+                            data[field.name] = res[field.name];
+                        }
+
+                        return resolve(new User(data));
+                    }
+
+                    resolve(undefined);
+                });
+        });
+    }
+
+
+
+    ReadByID(id: number): Promise<User | undefined> {
+        return new Promise<User | undefined>((resolve, reject) => {
+            this.connection.query(readByIDQuery,
+                [
+                    id,
                 ],
                 (error, results, fields) => {
                     if (error) {

@@ -10,3 +10,6 @@ export const passwordIsWrong = "Password is wrong";
 export const userIsBanned = "User was banned";
 export const idIsEmpty = "ID is empty";
 export const idLessThanZero = "ID less than zero";
+export const idIsWrong = "ID is wrong";
+export const conversationIsEmpty = "Conversation is empty";
+export const textIsEmpty = "Text is empty";

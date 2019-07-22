@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { bodyIsEmpty, loginIsEmpty, loginIsTooShort, loginIsTooLong, passwordIsEmpty, passwordIsTooShort, passwordIsTooLong, idIsEmpty, idLessThanZero } from "../../constants/errors";
+import { bodyIsEmpty, loginIsEmpty, loginIsTooShort, loginIsTooLong, passwordIsEmpty, passwordIsTooShort, passwordIsTooLong, idIsEmpty, idLessThanZero, conversationIsEmpty } from "../../constants/errors";
 import { RegistrationRequest, BanRequest } from "./users/models";
+import { SendRequest } from "./messages/models";
 
 
 export function validateBody(req: Request, res: Response, next: NextFunction) {
@@ -62,7 +63,26 @@ export function validateID(req: Request, res: Response, next: NextFunction) {
     next();
 }
 
+export function validateConversation(req: Request, res: Response, next: NextFunction) {
+    const body: SendRequest = req.body;
+
+    if (body.conversation == null || body.conversation.trim() == "") {
+        return res.status(400).send(conversationIsEmpty)
+    }
+    next();
+}
+
+export function validateText(req: Request, res: Response, next: NextFunction) {
+    const body: SendRequest = req.body;
+
+    if (body.text == null || body.text.trim() == "") {
+        return res.status(400).send(conversationIsEmpty)
+    }
+    next();
+}
+
 
 export const validateRegistrationRequest = [validateBody, validateLogin, validatePassword];
 export const validateLoginRequest = [validateBody, validateLogin, validatePassword];
 export const validateBanRequest = [validateBody, validateID];
+export const validateSendRequest = [validateConversation, validateText];
