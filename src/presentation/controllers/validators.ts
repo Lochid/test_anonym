@@ -17,7 +17,7 @@ export function validateBody(req: Request, res: Response, next: NextFunction) {
 export function validateLogin(req: Request, res: Response, next: NextFunction) {
     const body: RegistrationRequest = req.body;
 
-    if (!body.login) {
+    if (typeof body.login != "string" && body.login == "") {
         return res.status(400).send(loginIsEmpty)
     }
 
@@ -35,7 +35,7 @@ export function validateLogin(req: Request, res: Response, next: NextFunction) {
 export function validatePassword(req: Request, res: Response, next: NextFunction) {
     const body: RegistrationRequest = req.body;
 
-    if (!body.password) {
+    if (typeof body.password != "string" && body.password == "") {
         return res.status(400).send(passwordIsEmpty)
     }
 
@@ -53,7 +53,7 @@ export function validatePassword(req: Request, res: Response, next: NextFunction
 export function validateID(req: Request, res: Response, next: NextFunction) {
     const body: BanRequest = req.body;
 
-    if (body.id == null) {
+    if (typeof body.id == "number") {
         return res.status(400).send(idIsEmpty)
     }
 
@@ -66,7 +66,7 @@ export function validateID(req: Request, res: Response, next: NextFunction) {
 export function validateConversation(req: Request, res: Response, next: NextFunction) {
     const body: SendRequest = req.body;
 
-    if (body.conversation == null || body.conversation.trim() == "") {
+    if (typeof body.conversation != "string" || body.conversation.trim() == "") {
         return res.status(400).send(conversationIsEmpty)
     }
     next();
@@ -75,7 +75,7 @@ export function validateConversation(req: Request, res: Response, next: NextFunc
 export function validateText(req: Request, res: Response, next: NextFunction) {
     const body: SendRequest = req.body;
 
-    if (body.text == null || body.text.trim() == "") {
+    if (typeof body.conversation != "string" || body.text.trim() == "") {
         return res.status(400).send(conversationIsEmpty)
     }
     next();

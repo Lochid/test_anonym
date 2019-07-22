@@ -13,7 +13,7 @@ export default class Auth {
     }
 
     run(router: Router) {
-        router.use("/conversations", this.router);
+        router.use("/auth", this.router);
     }
 
     async login(req: Request, res: Response) {

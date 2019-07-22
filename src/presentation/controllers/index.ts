@@ -5,7 +5,7 @@ import {
 import http from "http";
 import express from 'express';
 import io from "socket.io";
-import socketioJwt from "socketio-jwt";
+import { verify, decode } from "jsonwebtoken";
 import passport from "passport";
 import passportJWT, { VerifiedCallback } from "passport-jwt";
 import { CONFIG, USER_SERVICE, MESSAGE_SERVICE } from '../../constants/identifiers';
@@ -56,19 +56,24 @@ export default class Controllers {
         const server = http.createServer(app);
         const socket = io.listen(server);
 
-        socket.on('connection', socketioJwt.authorize({
-            secret: jwtOptions.secretOrKey,
-            timeout: 15000
-        } as any)).on('authenticated', async (connection: any) => {
-            const user = await this.userService.ReadByID(connection.decoded_token.id);
+        socket.on('connection', (connection) => {
+            connection.on("authenticated", async (token: string) => {
+                try {
+                    const decoded_token = verify(token, jwtOptions.secretOrKey) as any;
+                    const user = await this.userService.ReadByID(decoded_token.id);
 
-            if (user == undefined) {
-                return connection.disconnect();
-            }
+                    if (user == undefined) {
+                        return connection.disconnect(true);
+                    }
 
-            if (user.banned) {
-                return connection.disconnect();
-            }
+                    if (user.banned) {
+                        return connection.disconnect(true);
+                    }
+                    connection.join('chat');
+                } catch (e) {
+                    return connection.disconnect(true);
+                }
+            })
         });
 
         const users = new Users(this.config.jwt.secret, this.userService);

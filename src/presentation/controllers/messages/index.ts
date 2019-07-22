@@ -12,7 +12,7 @@ export default class Messages {
         this.router.post("/", validateSendRequest, passport.authenticate('jwt', { session: false }), (req: Request, res: Response) => this.send(req, res));
 
         messageService.on("message", (message) => {
-            socket.emit("message", message);
+            socket.to('chat').emit("message", message);
         });
     }
 

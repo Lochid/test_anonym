@@ -17,8 +17,8 @@ export default class MessageService implements IMessageService {
         this.messageRepository = repositoryPool.MessageRepository();
     }
 
-    Send(userId: number, conversation: string, text: string): Promise<Message | undefined> {
-        const message = this.messageRepository.Create(new Message(0, userId, conversation, text, 0));
+    async Send(userId: number, conversation: string, text: string): Promise<Message | undefined> {
+        const message = await this.messageRepository.Create(new Message(0, userId, conversation, text, 0));
 
         if (message != null) {
             this.emitter.emit("message", message);

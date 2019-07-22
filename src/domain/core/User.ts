@@ -8,24 +8,19 @@ export default class User {
     constructor(id: number, login: string, passwordHash: string, banned: boolean);
 
     constructor(id: number | { [key: string]: any; }, login?: string, passwordHash?: string, banned?: boolean) {
-        const data: { [key: string]: any; } = {
-            id: 0,
-            login: "",
-            password_hash: "",
-            banned: false,
-        }
+        let data: { [key: string]: any; };
 
         if (typeof id == "object") {
-            for (const key in data) {
-                if (id.hasOwnProperty(key)) {
-                    data[key] = id[key];
-                }
+            data = {
+                ...id
             }
         } else {
-            data.id = id;
-            data.login = login;
-            data.password_hash = passwordHash;
-            data.banned = banned;
+            data = {
+                id,
+                login,
+                password_hash: passwordHash,
+                banned
+            };
         }
 
 
